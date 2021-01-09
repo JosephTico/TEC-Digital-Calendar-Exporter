@@ -1,8 +1,8 @@
 # requirements.txt
-requests
-flask
-ics
-beautifulsoup4
-lxml
-pyjwt
-pycryptodome
+requests==2.25.1
+flask==1.1.2
+ics==0.7
+beautifulsoup4==4.9.3
+lxml==4.6.2
+pyjwt==1.7.1
+pycryptodome==3.9.9

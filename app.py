@@ -30,12 +30,12 @@ def td_login(username, password):
     # Revisa potenciales respuestas del TD
     if login_response.json()['status'] == 'no_account':
         raise EnvironmentError('El usuario es incorrecto.')
-    elif login_response.json()['status'] == 'datic_bad_password':
+    if login_response.json()['status'] == 'datic_bad_password':
         raise EnvironmentError('La contraseña es incorrecta.')
-    elif login_response.json()['status'] == 'ok':
-        return session
-    else:
+    if login_response.json()['status'] != 'ok':
         raise EnvironmentError('El TEC Digital está caído.')
+
+    return session
 
 
 def get_calendar(user, password):

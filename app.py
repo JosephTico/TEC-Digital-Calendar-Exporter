@@ -218,6 +218,9 @@ def read_calendar(token):
     except requests.exceptions.Timeout:
         return 'El TEC Digital está caído. Por favor inténtelo de nuevo más tarde.', 503
 
+    except EnvironmentError as e:
+        return f'Ha ocurrido un error: {e}', 503
+
     except Exception as e:
         return f'Ha ocurrido un error: {e}', 500
 

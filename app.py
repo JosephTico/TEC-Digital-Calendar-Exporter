@@ -28,12 +28,16 @@ def td_login(username, password):
                                   })
 
     # Revisa potenciales respuestas del TD
+    # Check if response is not 200
+    if login_response.status_code != 200:
+        raise EnvironmentError('El TEC Digital está caído.')
     if login_response.json()['status'] == 'no_account':
         raise EnvironmentError('El usuario es incorrecto.')
     if login_response.json()['status'] == 'datic_bad_password':
         raise EnvironmentError('La contraseña es incorrecta.')
     if login_response.json()['status'] != 'ok':
-        raise EnvironmentError('El TEC Digital está caído.')
+        raise EnvironmentError(
+            f"El TEC Digital no está funcionando correctamente. {login_response.json()['message']}")
 
     return session
 

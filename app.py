@@ -107,6 +107,22 @@ def get_calendar(user, password):
     return cal
 
 
+def get_calendar_warning_outdated():
+    # Genera un evento falso para alertar a los usuarios que están usando un calendario obsoleto
+    cal = Calendar()
+    e = Event()
+    e.name = 'ACCIÓN NECESARIA: Debe actualizar su calendario del TEC Digital'
+    e.description = "Hola.\n\nHace un tiempo utilizó una herramienta para sincronizar el calendario de "\
+        "sus cursos del TEC Digital con su calendario personal. Recientemente el TEC Digital cambió el "\
+        "inicio de sesión y ahora se usa la cuenta de @estudiantec.cr, por lo que debe volver a realizar la "\
+        "sincronización.\n\nPara hacerlo entre a la página https://tdcal.josvar.com y siga las instrucciones "\
+        "nuevamente.\n\nSaludos, Joseph."
+    e.begin = datetime.datetime.now()
+    e.make_all_day()
+    cal.events.add(e)
+    return cal
+
+
 # Carga Flask
 app = Flask(__name__)
 
@@ -144,7 +160,7 @@ def create_token():
 
         # Genera un token JWT con los datos encriptados
         encoded_jwt = jwt.encode(
-            {'user': user, 'password': password, 'iv': iv}, SECRET, algorithm='HS256')
+            {'user': user, 'password': password, 'iv': iv, 'version': '1.1'}, SECRET, algorithm='HS256')
 
         return f'https://tdcal.josvar.com/{encoded_jwt}/cal.ics'
 
@@ -169,6 +185,12 @@ def read_calendar(token):
 
         # Decodifica el token
         data = jwt.decode(token, SECRET, algorithms=['HS256'])
+
+        print(data)
+
+        # Alerta a los usuarios que están usando la versión 1.0
+        if 'version' not in data:
+            return str(get_calendar_warning_outdated()), 200, {'Content-Type': 'text/calendar; charset=utf-8'}
 
         # Desencripta el usuario y contraseña
         if "iv" in data:

@@ -20,10 +20,10 @@ def td_login(username, password):
     session = requests.Session()
     login_response = session.post('https://tecdigital.tec.ac.cr/api/login/new-form/',
                                   allow_redirects=False, timeout=10, verify=False, json={
-                                      "email": username,
-                                      "password": password,
-                                      "retoken": "allow",
-                                      "returnUrl": "/dotlrn/index"
+                                      'email': username,
+                                      'password': password,
+                                      'retoken': 'allow',
+                                      'returnUrl': '/dotlrn/index'
 
                                   })
 
@@ -37,7 +37,7 @@ def td_login(username, password):
         raise EnvironmentError('La contraseña es incorrecta.')
     if login_response.json()['status'] != 'ok':
         raise EnvironmentError(
-            f"El TEC Digital no está funcionando correctamente. {login_response.json()['message']}")
+            f'El TEC Digital no está funcionando correctamente. {login_response.json()["message"]}')
 
     return session
 
@@ -49,7 +49,7 @@ def get_calendar(user, password):
     response = session.get('https://tecdigital.tec.ac.cr/dotlrn/calendar/view?date=' + date.strftime('%Y-%m-%d') + '&view=list&page_num=1&period_days=90',
                            allow_redirects=False, timeout=10, verify=False)
 
-    # Decidí usar EnvironmentError para erorres de datos de login
+    # Decidí usar EnvironmentError para errores de datos de login
     if response.status_code != 200:
         raise EnvironmentError(
             'Los datos son incorrectos o el TEC Digital está caído.')
@@ -91,7 +91,7 @@ def get_calendar(user, password):
             e.description = event_data[4].replace(
                 'Pulse aquí para ir a', 'Puede encontrar más detalles en')
         except IndexError:
-            e.description = ""
+            e.description = ''
         date = arrow.get(event_data[0], 'DD MMMM YYYY', locale='es').replace(
             tzinfo='America/Costa_Rica')
         e.begin = date
@@ -116,11 +116,11 @@ def get_calendar_warning_outdated():
     cal = Calendar()
     e = Event()
     e.name = 'ACCIÓN NECESARIA: Debe actualizar su calendario del TEC Digital'
-    e.description = "Hola.\n\nHace un tiempo utilizó una herramienta para sincronizar el calendario de "\
-        "sus cursos del TEC Digital con su calendario personal. Recientemente el TEC Digital cambió el "\
-        "inicio de sesión y ahora se usa la cuenta de @estudiantec.cr, por lo que debe volver a realizar la "\
-        "sincronización.\n\nPara hacerlo entre a la página https://tdcal.josvar.com y siga las instrucciones "\
-        "nuevamente.\n\nSaludos, Joseph."
+    e.description = 'Hola.\n\nHace un tiempo utilizó una herramienta para sincronizar el calendario de '\
+        'sus cursos del TEC Digital con su calendario personal. Recientemente el TEC Digital cambió el '\
+        'inicio de sesión y ahora se usa la cuenta de @estudiantec.cr, por lo que debe volver a realizar la '\
+        'sincronización.\n\nPara hacerlo entre a la página https://tdcal.josvar.com y siga las instrucciones '\
+        'nuevamente.\n\nSaludos, Joseph.'
     e.begin = datetime.datetime.now()
     e.make_all_day()
     cal.events.add(e)
@@ -132,9 +132,9 @@ app = Flask(__name__)
 
 
 # Página principal
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
 # Generación de tokens JWT
 
@@ -144,7 +144,7 @@ def create_token():
     try:
         if not SECRET:
             raise Exception(
-                "La variable de entorno SECRET no se ha inicializado.")
+                'La variable de entorno SECRET no se ha inicializado.')
 
         user = request.form['user'].strip().lower()
         password = request.form['password'].strip()
@@ -185,7 +185,7 @@ def read_calendar(token):
     try:
         if not SECRET:
             raise Exception(
-                "La variable de entorno SECRET no se ha inicializado.")
+                'La variable de entorno SECRET no se ha inicializado.')
 
         # Decodifica el token
         data = jwt.decode(token, SECRET, algorithms=['HS256'])
@@ -197,7 +197,7 @@ def read_calendar(token):
             return str(get_calendar_warning_outdated()), 200, {'Content-Type': 'text/calendar; charset=utf-8'}
 
         # Desencripta el usuario y contraseña
-        if "iv" in data:
+        if 'iv' in data:
             cipher = AES.new(SECRET[0:32].encode(
                 'utf-8'), AES.MODE_CFB, b64decode(data['iv']))
             user = cipher.decrypt(b64decode(data['user'])).decode('utf-8')
